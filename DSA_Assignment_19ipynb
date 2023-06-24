@@ -1,0 +1,607 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "394e0c6f-8875-4c13-9115-612978429693",
+   "metadata": {},
+   "source": [
+    "# Assignment Question 19"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "770b6355-bad5-41f7-ad98-9124538b9337",
+   "metadata": {},
+   "source": [
+    "1. Merge k Sorted Lists\n",
+    "You are given an array of `k` linked-lists `lists`, each linked-list is sorted in ascending order.\n",
+    "Merge all the linked-lists into one sorted linked-list and return it.\n",
+    "Example 1:\n",
+    "Input: lists = [[1,4,5],[1,3,4],[2,6]]\n",
+    "Output: [1,1,2,3,4,4,5,6]\n",
+    "Explanation: The linked-lists are:\n",
+    "[\n",
+    "  1->4->5,\n",
+    "  1->3->4,\n",
+    "  2->6\n",
+    "]\n",
+    "merging them into one sorted list:\n",
+    "1->1->2->3->4->4->5->6\n",
+    "Example 2:\n",
+    "Input: lists = []\n",
+    "Output: []\n",
+    "Example 3:\n",
+    "Input: lists = [[]]\n",
+    "Output: []\n",
+    "Constraints:\n",
+    "\n",
+    "- `k == lists.length`\n",
+    "- `0 <= k <= 10000`\n",
+    "- `0 <= lists[i].length <= 500`\n",
+    "- `-10000 <= lists[i][j] <= 10000`\n",
+    "- `lists[i]` is sorted in **ascending order**.\n",
+    "- The sum of `lists[i].length` will not exceed `10000`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "40187942-eab3-452f-8de9-9907730be5f8",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[1, 1, 2, 3, 4, 4, 5, 6]\n",
+      "[]\n",
+      "[]\n"
+     ]
+    }
+   ],
+   "source": [
+    "import heapq\n",
+    "\n",
+    "class ListNode:\n",
+    "    def __init__(self, val=0, next=None):\n",
+    "        self.val = val\n",
+    "        self.next = next\n",
+    "\n",
+    "def mergeKLists(lists):\n",
+    "    heap = []\n",
+    "    for i, node in enumerate(lists):\n",
+    "        if node:\n",
+    "            heapq.heappush(heap, (node.val, i, node))\n",
+    "\n",
+    "    dummy = ListNode()\n",
+    "    tail = dummy\n",
+    "\n",
+    "    while heap:\n",
+    "        _, i, node = heapq.heappop(heap)\n",
+    "\n",
+    "        tail.next = node\n",
+    "        tail = tail.next\n",
+    "\n",
+    "        if node.next:\n",
+    "            heapq.heappush(heap, (node.next.val, i, node.next))\n",
+    "\n",
+    "    return dummy.next\n",
+    "\n",
+    "def createLinkedList(values):\n",
+    "    dummy = ListNode()\n",
+    "    curr = dummy\n",
+    "    for val in values:\n",
+    "        curr.next = ListNode(val)\n",
+    "        curr = curr.next\n",
+    "    return dummy.next\n",
+    "\n",
+    "def convertToList(node):\n",
+    "    values = []\n",
+    "    while node:\n",
+    "        values.append(node.val)\n",
+    "        node = node.next\n",
+    "    return values\n",
+    "\n",
+    "lists = [\n",
+    "    createLinkedList([1, 4, 5]),\n",
+    "    createLinkedList([1, 3, 4]),\n",
+    "    createLinkedList([2, 6])\n",
+    "]\n",
+    "merged = mergeKLists(lists)\n",
+    "print(convertToList(merged))  \n",
+    "\n",
+    "empty_lists = []\n",
+    "merged_empty = mergeKLists(empty_lists)\n",
+    "print(convertToList(merged_empty))  \n",
+    "\n",
+    "lists_with_empty = [createLinkedList([])]\n",
+    "merged_with_empty = mergeKLists(lists_with_empty)\n",
+    "print(convertToList(merged_with_empty))  "
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "77204b5d-ce4f-4b35-802b-1d642b36d54c",
+   "metadata": {},
+   "source": [
+    "2. Count of Smaller Numbers After Self\n",
+    "Given an integer array `nums`, return an integer array `counts` where `counts[i]` is the number of smaller elements to the right of `nums[i]`.\n",
+    "Example 1:\n",
+    "Input: nums = [5,2,6,1]\n",
+    "Output: [2,1,1,0]\n",
+    "Explanation:\n",
+    "To the right of 5 there are2 smaller elements (2 and 1).\n",
+    "To the right of 2 there is only1 smaller element (1).\n",
+    "To the right of 6 there is1 smaller element (1).\n",
+    "To the right of 1 there is0 smaller element.\n",
+    "Example 2:\n",
+    "Input: nums = [-1]\n",
+    "Output: [0]\n",
+    "Example 3:\n",
+    "Input: nums = [-1,-1]\n",
+    "Output: [0,0]\n",
+    "Constraints:\n",
+    "\n",
+    "- `1 <= nums.length <= 100000`\n",
+    "- `-10000 <= nums[i] <= 10000`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "58d4b802-7cd5-4c08-a10b-e2988bb1ad3c",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[1, 1, 0, 0]\n",
+      "[0]\n",
+      "[0, 0]\n"
+     ]
+    }
+   ],
+   "source": [
+    "def countSmaller(nums):\n",
+    "    def mergeAndCount(left, right):\n",
+    "        i, j, count = 0, 0, 0\n",
+    "        merged = []\n",
+    "        while i < len(left) and j < len(right):\n",
+    "            if left[i][1] <= right[j][1]:\n",
+    "                merged.append(left[i])\n",
+    "                counts[left[i][0]] += count\n",
+    "                i += 1\n",
+    "            else:\n",
+    "                merged.append(right[j])\n",
+    "                j += 1\n",
+    "                count += 1\n",
+    "        merged.extend(left[i:])\n",
+    "        merged.extend(right[j:])\n",
+    "        return merged\n",
+    "\n",
+    "    def countSmallerRecursive(nums):\n",
+    "        if len(nums) <= 1:\n",
+    "            return nums\n",
+    "        mid = len(nums) // 2\n",
+    "        left = countSmallerRecursive(nums[:mid])\n",
+    "        right = countSmallerRecursive(nums[mid:])\n",
+    "        return mergeAndCount(left, right)\n",
+    "\n",
+    "    counts = [0] * len(nums)\n",
+    "    indexed_nums = list(enumerate(nums))\n",
+    "    countSmallerRecursive(indexed_nums)\n",
+    "    return counts\n",
+    "\n",
+    "nums = [5, 2, 6, 1]\n",
+    "counts = countSmaller(nums)\n",
+    "print(counts)  \n",
+    "\n",
+    "nums = [-1]\n",
+    "counts = countSmaller(nums)\n",
+    "print(counts)  \n",
+    "\n",
+    "nums = [-1, -1]\n",
+    "counts = countSmaller(nums)\n",
+    "print(counts)  "
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "8f1a56ac-1985-4ebb-add0-87bdd1e94b0b",
+   "metadata": {},
+   "source": [
+    "3. Sort an Array\n",
+    "Given an array of integers `nums`, sort the array in ascending order and return it.\n",
+    "You must solve the problem without using any built-in functions in `O(nlog(n))` time complexity and with the smallest space complexity possible.\n",
+    "Example 1:\n",
+    "Input: nums = [5,2,3,1]\n",
+    "Output: [1,2,3,5]\n",
+    "Explanation: After sorting the array, the positions of some numbers are not changed (for example, 2 and 3), while the positions of other numbers are changed (for example, 1 and 5).\n",
+    "Example 2:\n",
+    "Input: nums = [5,1,1,2,0,0]\n",
+    "Output: [0,0,1,1,2,5]\n",
+    "Explanation: Note that the values of nums are not necessairly unique.\n",
+    "Constraints:\n",
+    "\n",
+    "- `1 <= nums.length <= 5 * 10000`\n",
+    "- `-5 * 104 <= nums[i] <= 5 * 10000`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "b7fdf310-d040-4b7c-bb3a-5686ea84d7a4",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[1, 2, 3, 5]\n",
+      "[0, 0, 1, 1, 2, 5]\n"
+     ]
+    }
+   ],
+   "source": [
+    "def sortArray(nums):\n",
+    "    def merge(left, right):\n",
+    "        merged = []\n",
+    "        i = j = 0\n",
+    "        while i < len(left) and j < len(right):\n",
+    "            if left[i] < right[j]:\n",
+    "                merged.append(left[i])\n",
+    "                i += 1\n",
+    "            else:\n",
+    "                merged.append(right[j])\n",
+    "                j += 1\n",
+    "        merged.extend(left[i:])\n",
+    "        merged.extend(right[j:])\n",
+    "        return merged\n",
+    "\n",
+    "    def mergeSort(nums):\n",
+    "        if len(nums) <= 1:\n",
+    "            return nums\n",
+    "        mid = len(nums) // 2\n",
+    "        left = mergeSort(nums[:mid])\n",
+    "        right = mergeSort(nums[mid:])\n",
+    "        return merge(left, right)\n",
+    "\n",
+    "    return mergeSort(nums)\n",
+    "\n",
+    "nums = [5, 2, 3, 1]\n",
+    "sorted_nums = sortArray(nums)\n",
+    "print(sorted_nums)  \n",
+    "\n",
+    "nums = [5, 1, 1, 2, 0, 0]\n",
+    "sorted_nums = sortArray(nums)\n",
+    "print(sorted_nums)"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "c8e6b56c-85a3-4550-881e-27423aa663d8",
+   "metadata": {},
+   "source": [
+    "4. Move all zeroes to end of array\n",
+    "Given an array of random numbers, Push all the zero’s of a given array to the end of the array. For example, if the given arrays is {1, 9, 8, 4, 0, 0, 2, 7, 0, 6, 0}, it should be changed to {1, 9, 8, 4, 2, 7, 6, 0, 0, 0, 0}. The order of all other elements should be same. Expected time complexity is O(n) and extra space is O(1).\n",
+    "Example:\n",
+    "Input :  arr[] = {1, 2, 0, 4, 3, 0, 5, 0};\n",
+    "Output : arr[] = {1, 2, 4, 3, 5, 0, 0, 0};\n",
+    "\n",
+    "Input : arr[]  = {1, 2, 0, 0, 0, 3, 6};\n",
+    "Output : arr[] = {1, 2, 3, 6, 0, 0, 0};"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "e48cb9ce-13b6-4446-8125-3e9401348d5e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[1, 2, 4, 3, 5, 0, 0, 0]\n",
+      "[1, 2, 3, 6, 0, 0, 0]\n"
+     ]
+    }
+   ],
+   "source": [
+    "def moveZeroes(nums):\n",
+    "    n = len(nums)\n",
+    "    zero_index = 0  \n",
+    "\n",
+    "    for i in range(n):\n",
+    "        if nums[i] != 0:\n",
+    "            nums[zero_index] = nums[i]\n",
+    "            zero_index += 1\n",
+    "\n",
+    "    while zero_index < n:\n",
+    "        nums[zero_index] = 0\n",
+    "        zero_index += 1\n",
+    "\n",
+    "    return nums\n",
+    "arr = [1, 2, 0, 4, 3, 0, 5, 0]\n",
+    "arr = moveZeroes(arr)\n",
+    "print(arr)  \n",
+    "\n",
+    "arr = [1, 2, 0, 0, 0, 3, 6]\n",
+    "arr = moveZeroes(arr)\n",
+    "print(arr)  "
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "35213e6f-55d5-4621-aadb-e6b9a2912671",
+   "metadata": {},
+   "source": [
+    "5. Rearrange array in alternating positive & negative items with O(1) extra space\n",
+    "\n",
+    "Given an array of positive and negative numbers, arrange them in an alternate fashion such that every positive number is followed by a negative and vice-versa maintaining the order of appearance. The number of positive and negative numbers need not be equal. If there are more positive numbers they appear at the end of the array. If there are more negative numbers, they too appear at the end of the array.\n",
+    "\n",
+    "Examples:\n",
+    "Input:  arr[] = {1, 2, 3, -4, -1, 4}\n",
+    "Output: arr[] = {-4, 1, -1, 2, 3, 4}\n",
+    "\n",
+    "Input:  arr[] = {-5, -2, 5, 2, 4, 7, 1, 8, 0, -8}\n",
+    "Output: arr[] = {-5, 5, -2, 2, -8, 4, 7, 1, 8, 0}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "f7cc98f9-3f4f-4e00-884e-ae1c9e44a456",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[-4, -1, 3, 1, 2, 4]\n",
+      "[5, 2, 4, 7, 1, 8, 0, -2, -5, -8]\n"
+     ]
+    }
+   ],
+   "source": [
+    "def rearrangeArray(nums):\n",
+    "    n = len(nums)\n",
+    "    i = 0  \n",
+    "    j = 0  \n",
+    "\n",
+    "    while i < n and j < n:\n",
+    "        while i < n and nums[i] < 0:\n",
+    "            i += 1\n",
+    "\n",
+    "        while j < n and nums[j] >= 0:\n",
+    "            j += 1\n",
+    "\n",
+    "        if i < n and j < n:\n",
+    "            nums[i], nums[j] = nums[j], nums[i]\n",
+    "\n",
+    "    return nums\n",
+    "\n",
+    "arr = [1, 2, 3, -4, -1, 4]\n",
+    "arr = rearrangeArray(arr)\n",
+    "print(arr)\n",
+    "\n",
+    "arr = [-5, -2, 5, 2, 4, 7, 1, 8, 0, -8]\n",
+    "arr = rearrangeArray(arr)\n",
+    "print(arr)  "
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "e903a0bb-a385-47cd-805d-2cf7b0664b63",
+   "metadata": {},
+   "source": [
+    "6. Merge two sorted arrays\n",
+    "Given two sorted arrays, the task is to merge them in a sorted manner.\n",
+    "Examples:\n",
+    "Input: arr1[] = { 1, 3, 4, 5}, arr2[] = {2, 4, 6, 8} \n",
+    "Output: arr3[] = {1, 2, 3, 4, 4, 5, 6, 8}\n",
+    "\n",
+    "Input: arr1[] = { 5, 8, 9}, arr2[] = {4, 7, 8}\n",
+    "Output: arr3[] = {4, 5, 7, 8, 8, 9}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "ba7d707a-c98e-4801-8a7a-1011a7a94033",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[1, 2, 3, 4, 4, 5, 6, 8]\n",
+      "[4, 5, 7, 8, 8, 9]\n"
+     ]
+    }
+   ],
+   "source": [
+    "def mergeArrays(arr1, arr2):\n",
+    "    n1 = len(arr1)  \n",
+    "    n2 = len(arr2)  \n",
+    "\n",
+    "    i = 0  \n",
+    "    j = 0  \n",
+    "    k = 0  \n",
+    "\n",
+    "    merged = [0] * (n1 + n2)\n",
+    "\n",
+    "    while i < n1 and j < n2:\n",
+    "        if arr1[i] <= arr2[j]:\n",
+    "            merged[k] = arr1[i]\n",
+    "            i += 1\n",
+    "        else:\n",
+    "            merged[k] = arr2[j]\n",
+    "            j += 1\n",
+    "        k += 1\n",
+    "    while i < n1:\n",
+    "        merged[k] = arr1[i]\n",
+    "        i += 1\n",
+    "        k += 1\n",
+    "\n",
+    "    while j < n2:\n",
+    "        merged[k] = arr2[j]\n",
+    "        j += 1\n",
+    "        k += 1\n",
+    "\n",
+    "    return merged\n",
+    "\n",
+    "arr1 = [1, 3, 4, 5]\n",
+    "arr2 = [2, 4, 6, 8]\n",
+    "arr3 = mergeArrays(arr1, arr2)\n",
+    "print(arr3)  \n",
+    "\n",
+    "arr1 = [5, 8, 9]\n",
+    "arr2 = [4, 7, 8]\n",
+    "arr3 = mergeArrays(arr1, arr2)\n",
+    "print(arr3)  "
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "0ad80f22-a97a-4520-a617-69b4cd432b22",
+   "metadata": {},
+   "source": [
+    "7. Intersection of Two Arrays\n",
+    "Given two integer arrays `nums1` and `nums2`, return an array of their intersection. Each element in the result must be unique and you may return the result in any order.\n",
+    "Example 1:\n",
+    "Input: nums1 = [1,2,2,1], nums2 = [2,2]\n",
+    "Output: [2]\n",
+    "Example 2:\n",
+    "Input: nums1 = [4,9,5], nums2 = [9,4,9,8,4]\n",
+    "Output: [9,4]\n",
+    "Explanation: [4,9] is also accepted.\n",
+    "Constraints:\n",
+    "\n",
+    "- `1 <= nums1.length, nums2.length <= 1000`\n",
+    "- `0 <= nums1[i], nums2[i] <= 1000`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "be5178ee-8ba6-479d-a62a-38a23f541979",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[2]\n",
+      "[9, 4]\n"
+     ]
+    }
+   ],
+   "source": [
+    "def intersection(nums1, nums2):\n",
+    "    set1 = set(nums1)  \n",
+    "    result = []\n",
+    "\n",
+    "    for num in nums2:\n",
+    "        if num in set1:\n",
+    "            result.append(num)\n",
+    "            set1.remove(num)  \n",
+    "\n",
+    "    return result\n",
+    "\n",
+    "nums1 = [1, 2, 2, 1]\n",
+    "nums2 = [2, 2]\n",
+    "result = intersection(nums1, nums2)\n",
+    "print(result)  \n",
+    "\n",
+    "nums1 = [4, 9, 5]\n",
+    "nums2 = [9, 4, 9, 8, 4]\n",
+    "result = intersection(nums1, nums2)\n",
+    "print(result)  "
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "4b333a78-0f8b-4bb4-9207-4b89d85e0efc",
+   "metadata": {},
+   "source": [
+    "8. Intersection of Two Arrays II\n",
+    "Given two integer arrays `nums1` and `nums2`, return an array of their intersection. Each element in the result must appear as many times as it shows in both arrays and you may return the result in any order.\n",
+    "Example 1:\n",
+    "Input: nums1 = [1,2,2,1], nums2 = [2,2]\n",
+    "Output: [2,2]\n",
+    "Example 2:\n",
+    "Input: nums1 = [4,9,5], nums2 = [9,4,9,8,4]\n",
+    "Output: [4,9]\n",
+    "Explanation: [9,4] is also accepted.\n",
+    "Constraints:\n",
+    "\n",
+    "- `1 <= nums1.length, nums2.length <= 1000`\n",
+    "- `0 <= nums1[i], nums2[i] <= 1000`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "93fccd87-d2d9-4808-8190-4be7ea55021a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[2, 2]\n",
+      "[4, 9]\n"
+     ]
+    }
+   ],
+   "source": [
+    "from collections import Counter\n",
+    "\n",
+    "def intersect(nums1, nums2):\n",
+    "    counter1 = Counter(nums1)  \n",
+    "    counter2 = Counter(nums2)  \n",
+    "    result = []\n",
+    "\n",
+    "    for num in counter1.keys():\n",
+    "        if num in counter2:\n",
+    "            freq = min(counter1[num], counter2[num])\n",
+    "            result.extend([num] * freq)\n",
+    "\n",
+    "    return result\n",
+    "\n",
+    "nums1 = [1, 2, 2, 1]\n",
+    "nums2 = [2, 2]\n",
+    "result = intersect(nums1, nums2)\n",
+    "print(result)  \n",
+    "\n",
+    "nums1 = [4, 9, 5]\n",
+    "nums2 = [9, 4, 9, 8, 4]\n",
+    "result = intersect(nums1, nums2)\n",
+    "print(result)  "
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
